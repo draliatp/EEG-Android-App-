@@ -1,0 +1,31 @@
+public boolean exportTableToCSVFile(Cursor csvCursor, String fileName) {
+        File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+
+        if (!exportDir.exists()) {
+            exportDir.mkdirs();
+        }
+
+        File file = new File(exportDir, fileName);
+        try {
+            file.createNewFile();
+            CSVWriter csvWriter = new CSVWriter(new FileWriter(file));
+            csvWriter.writeNext(csvCursor.getColumnNames());
+            if (csvCursor.getCount() > 0) {
+                while (csvCursor.moveToNext()) {
+                    String arrayOfStrings[] = {csvCursor.getString(0), csvCursor.getString(1), csvCursor.getString(2), csvCursor.getString(3)};
+                    csvWriter.writeNext(arrayOfStrings);
+                }
+            } else {
+                return false;
+            }
+            csvWriter.close();
+            csvCursor.close();
+            return true;
+        } catch (SQLException sqlException) {
+            LOGE(TAG, sqlException.getMessage(), sqlException);
+            return false;
+        } catch (IOException ioException) {
+            LOGE(TAG, ioException.getMessage(), ioException);
+            return false;
+        }
+    }
